@@ -8,8 +8,8 @@ walker wraps around and interferes with itself. Run::
 Saves the animation to 'cycle_walk.gif'.
 """
 
-from quantum_walks import Graph, Walker, DiscreteTimeWalk
-from quantum_walks import viz
+from zitterwalk import Graph, Walker, DiscreteTimeWalk
+from zitterwalk import viz
 
 
 def main():

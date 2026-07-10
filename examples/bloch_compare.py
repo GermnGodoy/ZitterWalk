@@ -16,8 +16,8 @@ Saves the animation to 'bloch_compare.gif'.
 
 import numpy as np
 
-from quantum_walks import Graph, Walker, DiscreteTimeWalk
-from quantum_walks import viz
+from zitterwalk import Graph, Walker, DiscreteTimeWalk
+from zitterwalk import viz
 
 
 def main():

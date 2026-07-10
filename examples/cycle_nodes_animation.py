@@ -8,8 +8,8 @@ The nodes are laid out on a ring and their color is animated according to how
 Saves the animation to 'cycle_nodes.gif'.
 """
 
-from quantum_walks import Graph, Walker, DiscreteTimeWalk
-from quantum_walks import viz
+from zitterwalk import Graph, Walker, DiscreteTimeWalk
+from zitterwalk import viz
 
 
 def main():

@@ -1,17 +1,17 @@
-"""quantum_walks: a simple package to simulate Discrete-Time Quantum Walks.
+"""zitterwalk: a simple package to simulate Discrete-Time Quantum Walks.
 
 Main pieces
 -----------
-* :class:`~quantum_walks.graph.Graph` (+ :class:`Node`, :class:`Edge`):
+* :class:`~zitterwalk.graph.Graph` (+ :class:`Node`, :class:`Edge`):
   the topology, with arc representation.
-* :mod:`~quantum_walks.coin`: coins (Hadamard, Grover, Fourier).
-* :class:`~quantum_walks.walker.Walker`: the initial quantum state.
-* :class:`~quantum_walks.walk.DiscreteTimeWalk`: the evolution engine.
-* :mod:`~quantum_walks.viz`: visualization with matplotlib.
+* :mod:`~zitterwalk.coin`: coins (Hadamard, Grover, Fourier).
+* :class:`~zitterwalk.walker.Walker`: the initial quantum state.
+* :class:`~zitterwalk.walk.DiscreteTimeWalk`: the evolution engine.
+* :mod:`~zitterwalk.viz`: visualization with matplotlib.
 
 Quick example
 -------------
->>> from quantum_walks import Graph, Walker, DiscreteTimeWalk
+>>> from zitterwalk import Graph, Walker, DiscreteTimeWalk
 >>> g = Graph.line(101)
 >>> w = Walker.at_node(g, 50, coin_state=[1, 1j])   # symmetric start
 >>> walk = DiscreteTimeWalk(g, coin="hadamard")

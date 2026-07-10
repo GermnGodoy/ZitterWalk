@@ -6,8 +6,8 @@ Do not depend on matplotlib.
 
 import numpy as np
 
-from quantum_walks import Graph, Walker, DiscreteTimeWalk
-from quantum_walks.coin import grover, fourier, hadamard
+from zitterwalk import Graph, Walker, DiscreteTimeWalk
+from zitterwalk.coin import grover, fourier, hadamard
 
 
 # ---------------------------------------------------------------------- #

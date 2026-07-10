@@ -6,3 +6,5 @@ build/
 dist/
 *.png
 *.gif
+!assets/*.png
+!assets/*.gif

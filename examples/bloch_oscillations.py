@@ -16,8 +16,8 @@ Saves the figure to 'bloch_oscillations.png'.
 import numpy as np
 import matplotlib.pyplot as plt
 
-from quantum_walks import Graph, Walker, DiscreteTimeWalk
-from quantum_walks import viz
+from zitterwalk import Graph, Walker, DiscreteTimeWalk
+from zitterwalk import viz
 
 
 def main():

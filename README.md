@@ -1,7 +1,23 @@
-# quantum_walks
+# ZitterWalk
 
-A simple package to simulate **Discrete-Time Quantum Walks (DTQW)**, meant for
-studying and experimenting. It only depends on `numpy` and `matplotlib`.
+<p align="center">
+  <img src="assets/cycle_nodes.gif" alt="Quantum walk on a cycle, nodes colored by probability" width="380">
+</p>
+
+<p align="center">
+  <em>A simple, dependency-light package to simulate <strong>Discrete-Time Quantum Walks (DTQW)</strong>,
+  built for studying and experimenting.</em>
+</p>
+
+<p align="center">
+  <a href="https://www.python.org/"><img alt="Python" src="https://img.shields.io/badge/python-3.10%2B-blue.svg"></a>
+  <a href="pyproject.toml"><img alt="License" src="https://img.shields.io/badge/license-MIT-green.svg"></a>
+  <a href="#tests"><img alt="Dependencies" src="https://img.shields.io/badge/deps-numpy%20%2B%20matplotlib-informational.svg"></a>
+</p>
+
+The package is called **`zitterwalk`** — named after *Zitterbewegung* ("trembling
+motion"), the jittery back-and-forth of a relativistic particle that DTQWs
+reproduce at the discrete level. It only depends on `numpy` and `matplotlib`.
 
 ## Core idea
 
@@ -18,6 +34,31 @@ walker is at `u` heading towards `v`". On that basis:
 
 This arc formulation generalizes to **any graph** (not just the line).
 
+## What it looks like
+
+The canonical example — a Hadamard walk on a line — spreads **ballistically**
+(`O(t)`) instead of diffusing like a classical random walk (`O(√t)`), giving
+the characteristic "two-horn" distribution:
+
+<p align="center">
+  <img src="assets/line_hadamard.png" alt="Hadamard walk: two-horn distribution, time evolution and quantum vs classical comparison" width="820">
+</p>
+
+An animated version of the same walk, with an adaptive y-axis so the spread
+stays visible over time:
+
+<p align="center">
+  <img src="assets/line_walk.gif" alt="Animated Hadamard walk on a line" width="560">
+</p>
+
+Adding an electric field along the line reveals **Bloch oscillations** and
+**dynamical localization**, depending on whether the field is a rational or
+irrational multiple of `2π`:
+
+<p align="center">
+  <img src="assets/bloch_oscillations.png" alt="Electric quantum walk: free spreading vs Bloch oscillations vs localization" width="820">
+</p>
+
 ## Structure
 
 | Module | Responsibility |
@@ -31,10 +72,16 @@ This arc formulation generalizes to **any graph** (not just the line).
 The three responsibilities —**topology**, **state** and **dynamics**— are
 separated on purpose.
 
+## Install
+
+```bash
+pip install -e .
+```
+
 ## Quick use
 
 ```python
-from quantum_walks import Graph, Walker, DiscreteTimeWalk
+from zitterwalk import Graph, Walker, DiscreteTimeWalk
 
 g = Graph.line(201)                                 # line of 201 nodes
 w = Walker.at_node(g, 100, coin_state=[1, 1j])      # symmetric start

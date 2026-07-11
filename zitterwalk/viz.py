@@ -96,7 +96,7 @@ def plot_evolution(walk, states, ax=None, cmap="viridis"):
 
 
 def animate(walk, states, save_path=None, kind="line", fps=10,
-            cmap=None, node_size=300, interval=None, smooth=0.15):
+            cmap=None, node_size=300, interval=None, smooth=0.15, substeps=4):
     """Animate the per-node probability over time.
 
     Args:
@@ -112,6 +112,9 @@ def animate(walk, states, save_path=None, kind="line", fps=10,
         smooth: 'line' only. Smoothing of the adaptive y-axis, in (0, 1]. Small
               values track the shrinking peak slowly (roughly normalized height
               without fully rescaling every frame); 1 rescales each frame.
+        substeps: 'graph' only. Number of interpolated sub-frames inserted
+              between consecutive steps for a smoother transition (the total
+              playback duration is unchanged); 1 disables interpolation.
     Returns:
         A matplotlib FuncAnimation.
     """
@@ -130,7 +133,7 @@ def animate(walk, states, save_path=None, kind="line", fps=10,
     elif kind == "bar":
         anim = _animate_bar(walk, probs, vmax, interval)
     elif kind == "graph":
-        anim = _animate_graph(walk, probs, interval, cmap, node_size, smooth)
+        anim = _animate_graph(walk, probs, interval, cmap, node_size, vmax, substeps)
     else:
         raise ValueError(f"Unknown kind: {kind!r} (use 'line', 'bar' or 'graph')")
 
@@ -140,10 +143,16 @@ def animate(walk, states, save_path=None, kind="line", fps=10,
 
 
 def _save_anim(anim, save_path, fps):
-    """Save an animation (GIF via Pillow when the path ends in '.gif')."""
+    """Save an animation (GIF via Pillow when the path ends in '.gif').
+
+    Uses ``anim._save_fps`` when set (e.g. by :func:`_animate_graph`, whose
+    sub-frame interpolation needs a higher save fps to keep the same
+    real-time duration) instead of the nominal ``fps``.
+    """
     import matplotlib.pyplot as plt
     from matplotlib.animation import PillowWriter
 
+    fps = getattr(anim, "_save_fps", fps)
     writer = PillowWriter(fps=fps) if str(save_path).endswith(".gif") else None
     anim.save(save_path, writer=writer)
     plt.close(anim._fig)
@@ -323,7 +332,24 @@ def _animate_bar(walk, probs, vmax, interval):
     return anim
 
 
-def _animate_graph(walk, probs, interval, cmap, node_size, smooth):
+def _interpolate_frames(probs, substeps):
+    """Linearly interpolate ``substeps`` sub-frames between consecutive steps.
+
+    Returns ``(interpolated_probs, t_values)``, where ``t_values`` holds the
+    (possibly fractional) original step index of each interpolated frame.
+    """
+    n = len(probs)
+    if substeps <= 1 or n < 2:
+        return probs, np.arange(n, dtype=float)
+    t_src = np.arange(n)
+    t_dst = np.linspace(0, n - 1, (n - 1) * substeps + 1)
+    interp = np.empty((len(t_dst), probs.shape[1]))
+    for j in range(probs.shape[1]):
+        interp[:, j] = np.interp(t_dst, t_src, probs[:, j])
+    return interp, t_dst
+
+
+def _animate_graph(walk, probs, interval, cmap, node_size, vmax, substeps):
     import matplotlib.pyplot as plt
     from matplotlib.animation import FuncAnimation
 
@@ -332,9 +358,9 @@ def _animate_graph(walk, probs, interval, cmap, node_size, smooth):
         cmap = _qwalk_cmap()
     graph = walk.graph
     pos = layout(graph)
-    # Adaptive color scale, so populated nodes stay vivid even as the walk
-    # spreads (a fixed scale washes out most frames on small cycles that revive).
-    ymax = _smoothed_ymax(probs, smooth)
+
+    probs_i, times = _interpolate_frames(probs, substeps)
+    frame_interval = interval / substeps
 
     fig, ax = plt.subplots(figsize=(6, 6))
     fig.patch.set_facecolor(p["bg"])
@@ -348,23 +374,28 @@ def _animate_graph(walk, probs, interval, cmap, node_size, smooth):
 
     xs = [pos[n][0] for n in graph.nodes]
     ys = [pos[n][1] for n in graph.nodes]
-    sc = ax.scatter(xs, ys, c=probs[0], s=node_size, cmap=cmap,
-                    vmin=0, vmax=ymax[0], zorder=2,
+    # Fixed color scale: stays constant across the whole animation instead of
+    # rescaling every frame (t=0's localized spike is excluded from vmax, see
+    # the caller, so it just saturates rather than washing out later frames).
+    sc = ax.scatter(xs, ys, c=probs_i[0], s=node_size, cmap=cmap,
+                    vmin=0, vmax=vmax, zorder=2,
                     edgecolors=p["fg"], linewidths=1.2)
     cbar = fig.colorbar(sc, ax=ax, label="probability", shrink=0.8)
     cbar.ax.yaxis.label.set_color(p["fg"])
     cbar.ax.tick_params(colors=p["fg"])
     ax.set_aspect("equal")
+    # Margin so large node markers aren't clipped by the axes edge.
+    ax.margins(0.15)
     ax.axis("off")
     title = ax.set_title("t = 0", color=p["fg"], fontweight="bold")
 
-    def update(t):
-        sc.set_array(probs[t])
-        sc.set_clim(0, ymax[t] * 1.1)
-        title.set_text(f"t = {t}")
+    def update(i):
+        sc.set_array(probs_i[i])
+        title.set_text(f"t = {int(np.floor(times[i]))}")
         return (sc, title)
 
-    anim = FuncAnimation(fig, update, frames=len(probs),
-                         interval=interval, blit=False)
+    anim = FuncAnimation(fig, update, frames=len(probs_i),
+                         interval=frame_interval, blit=False)
     anim._fig = fig
+    anim._save_fps = 1000.0 / frame_interval
     return anim

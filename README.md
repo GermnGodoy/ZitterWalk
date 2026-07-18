@@ -37,18 +37,16 @@ walker spreads **ballistically**,
 
 $$\sigma(t) \sim t,$$
 
-quadratically faster than its classical cousin. That gap is why quantum walks
-matter: they are a **universal model of quantum computation** and the engine
-behind algorithms such as spatial search in $O(\sqrt{N})$, and — with the right
-shift — they even discretize the 1-D **Dirac equation**.
+quadratically faster than its classical brother. This makes them really suitable
+for some algorithms, specially search ones. They are theorically interesting as well,
+as they reproduce Dirac and Schrödinger equations in certain limits.
 
 <p align="center">
   <img src="assets/line_hadamard.png" alt="Hadamard walk: two-horn distribution, time evolution and quantum vs classical comparison" width="820">
 </p>
 
-The signature "two-horn" distribution of a Hadamard walk on a line: probability
-piles up at the ballistic fronts near $\pm t/\sqrt{2}$ instead of forming a
-classical bell curve.
+The signature distribution of a Hadamard walk on a line, probability
+piles up at the ballistic fronts near $\pm t/\sqrt{2}$.
 
 ## Install
 

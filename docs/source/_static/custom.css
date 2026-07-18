@@ -1,0 +1,32 @@
+/* ZitterWalk documentation - small cosmetic tweaks on top of the RTD theme. */
+
+/* The site-wide review note added through _templates/footer.html. */
+.zitter-footer-note {
+    margin-top: 0.6em;
+    padding-top: 0.6em;
+    border-top: 1px solid #e1e4e5;
+    font-size: 0.85em;
+    font-style: italic;
+    color: #808080;
+}
+
+/* An indigo/violet accent to match the package's plotting palette. */
+.wy-side-nav-search {
+    background-color: #5b5bd6;
+}
+
+a,
+a:visited {
+    color: #5b5bd6;
+}
+
+.rst-content code.literal,
+.rst-content tt.literal {
+    color: #7c3aed;
+}
+
+/* Keep wide result figures and tables from overflowing the content column. */
+.rst-content img {
+    max-width: 100%;
+    height: auto;
+}

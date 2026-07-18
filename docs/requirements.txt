@@ -1,0 +1,16 @@
+# Dependencies for building the ZitterWalk documentation.
+#
+#   pip install -r docs/requirements.txt
+#
+# The package's own runtime dependencies (numpy, matplotlib) come in when the
+# package itself is installed (`pip install -e .` locally, or via the
+# `python.install` step in ../.readthedocs.yaml on Read the Docs). They are
+# pinned here too so the plot_directive and autodoc imports work in a bare docs
+# environment.
+
+sphinx>=7.0
+sphinx-rtd-theme>=2.0
+myst-parser>=2.0
+
+numpy>=1.24
+matplotlib>=3.6

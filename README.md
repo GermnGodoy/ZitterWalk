@@ -12,6 +12,8 @@
   <a href="https://www.python.org/"><img alt="Python" src="https://img.shields.io/badge/python-3.10%2B-blue.svg"></a>
   <a href="pyproject.toml"><img alt="License" src="https://img.shields.io/badge/license-MIT-green.svg"></a>
   <img alt="Dependencies" src="https://img.shields.io/badge/deps-numpy%20%2B%20matplotlib-informational.svg">
+  <a href="https://germngodoy.github.io/ZitterWalk/"><img alt="Documentation" src="https://img.shields.io/badge/docs-online-5b5bd6.svg"></a>
+  <a href="https://github.com/GermnGodoy/ZitterWalk/actions/workflows/docs.yml"><img alt="Docs build" src="https://github.com/GermnGodoy/ZitterWalk/actions/workflows/docs.yml/badge.svg"></a>
 </p>
 
 ## What is a quantum walk?

@@ -1,0 +1,60 @@
+name: Docs
+
+# Build the Sphinx documentation and publish it to GitHub Pages.
+on:
+  push:
+    branches: [main]
+  pull_request:            # build (but don't deploy) PRs, to catch breakage
+  workflow_dispatch:       # allow manual runs from the Actions tab
+
+# Permissions the deploy job needs to push to GitHub Pages via OIDC.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never run two Pages deployments at once; let a running one finish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r docs/requirements.txt
+          pip install .
+
+      - name: Build HTML (warnings are errors)
+        run: sphinx-build -b html -W --keep-going docs/source docs/build/html
+
+      - name: Run doctests
+        run: sphinx-build -b doctest docs/source docs/build/doctest
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/build/html
+
+  deploy:
+    # Only publish from the default branch, not from pull requests.
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,29 @@
+# Read the Docs configuration for ZitterWalk.
+# https://docs.readthedocs.io/en/stable/config-file/v2.html
+version: 2
+
+build:
+  os: ubuntu-24.04
+  tools:
+    python: "3.12"
+  # graphviz is only needed if you switch the architecture diagram over to the
+  # sphinx.ext.graphviz directive; the shipped diagram is a static SVG, so this
+  # is optional. Kept here as a convenience.
+  apt_packages:
+    - graphviz
+
+sphinx:
+  configuration: docs/source/conf.py
+  fail_on_warning: true
+
+python:
+  install:
+    # The documentation requirements (Sphinx, theme, MyST, numpy, matplotlib).
+    - requirements: docs/requirements.txt
+    # The package itself, so autodoc and the plot_directive can import it.
+    - method: pip
+      path: .
+
+formats:
+  - pdf
+  - htmlzip

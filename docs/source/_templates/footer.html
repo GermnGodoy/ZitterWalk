@@ -1,0 +1,14 @@
+{% extends "!footer.html" %}
+
+{#
+  Append a fixed review note to the footer of every page. Overriding the
+  theme's ``extrafooter`` block keeps the default "Built with Sphinx" line
+  intact and simply adds our text underneath it, so the note appears site-wide
+  without touching any individual page.
+#}
+{% block extrafooter %}
+  {{ super() }}
+  <div class="zitter-footer-note">
+    Documentación generada con Sphinx y Claude, revisada manualmente.
+  </div>
+{% endblock %}

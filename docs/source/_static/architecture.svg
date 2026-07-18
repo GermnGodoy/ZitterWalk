@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 380" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 z" fill="#5b5bd6"/>
+    </marker>
+    <style>
+      .box   { fill: #f5f5ff; stroke: #5b5bd6; stroke-width: 2; rx: 10; }
+      .accent{ fill: #ede9fe; stroke: #7c3aed; stroke-width: 2; rx: 10; }
+      .title { fill: #2b2d42; font-size: 17px; font-weight: 700; }
+      .code  { fill: #5b5bd6; font-size: 13px; font-family: 'SFMono-Regular', Consolas, monospace; }
+      .sub   { fill: #6b6b80; font-size: 12px; }
+      .edge  { stroke: #5b5bd6; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .lbl   { fill: #7c3aed; font-size: 12.5px; font-weight: 600; }
+    </style>
+  </defs>
+
+  <!-- Graph -->
+  <rect class="box" x="30" y="150" width="170" height="88" rx="10"/>
+  <text class="title" x="115" y="182" text-anchor="middle">Graph</text>
+  <text class="code"  x="115" y="204" text-anchor="middle">nodes + edges</text>
+  <text class="sub"   x="115" y="223" text-anchor="middle">→ arcs (directed)</text>
+
+  <!-- Coin -->
+  <rect class="box" x="270" y="60" width="160" height="80" rx="10"/>
+  <text class="title" x="350" y="92" text-anchor="middle">Coin  C</text>
+  <text class="sub"   x="350" y="114" text-anchor="middle">mixes directions</text>
+  <text class="code"  x="350" y="131" text-anchor="middle">hadamard · grover …</text>
+
+  <!-- Shift -->
+  <rect class="box" x="270" y="248" width="160" height="80" rx="10"/>
+  <text class="title" x="350" y="280" text-anchor="middle">Shift  S</text>
+  <text class="sub"   x="350" y="302" text-anchor="middle">moves amplitude</text>
+  <text class="code"  x="350" y="319" text-anchor="middle">flip_flop · moving</text>
+
+  <!-- Step operator U -->
+  <rect class="accent" x="500" y="150" width="150" height="88" rx="10"/>
+  <text class="title" x="575" y="182" text-anchor="middle">Step  U</text>
+  <text class="code"  x="575" y="206" text-anchor="middle">U = S · C</text>
+  <text class="sub"   x="575" y="224" text-anchor="middle">unitary</text>
+
+  <!-- Walker state -->
+  <rect class="box" x="720" y="60" width="170" height="80" rx="10"/>
+  <text class="title" x="805" y="92" text-anchor="middle">Walker  ψ</text>
+  <text class="sub"   x="805" y="114" text-anchor="middle">amplitudes on arcs</text>
+  <text class="code"  x="805" y="131" text-anchor="middle">at_node · gaussian</text>
+
+  <!-- Observables / viz -->
+  <rect class="box" x="720" y="248" width="170" height="80" rx="10"/>
+  <text class="title" x="805" y="280" text-anchor="middle">Observables</text>
+  <text class="sub"   x="805" y="302" text-anchor="middle">probabilities, std,</text>
+  <text class="code"  x="805" y="319" text-anchor="middle">entropy · viz</text>
+
+  <!-- edges -->
+  <path class="edge" d="M200,178 C235,150 240,120 268,105"/>
+  <path class="edge" d="M200,210 C235,240 240,270 268,283"/>
+  <path class="edge" d="M430,100 C465,120 470,150 498,172"/>
+  <path class="edge" d="M430,288 C465,268 470,240 498,216"/>
+  <path class="edge" d="M650,180 C685,150 690,120 718,105"/>
+  <text class="lbl" x="700" y="150">apply U^t</text>
+  <path class="edge" d="M805,140 C805,175 805,200 805,246"/>
+  <text class="lbl" x="815" y="196">measure</text>
+</svg>

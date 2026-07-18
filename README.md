@@ -16,7 +16,7 @@
 
 ## What is a quantum walk?
 
-A classical **random walk** is the microscopic picture of diffusion: at each step
+A classical **random walk** is a movement where at each step
 the walker flips a coin and moves left or right. After $t$ steps its position
 spreads as
 

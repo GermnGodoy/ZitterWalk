@@ -21,6 +21,7 @@ from zitterwalk import viz
 
 
 def main():
+    """Run the Bloch-oscillations example and save the figure."""
     n = 161
     center = n // 2
     steps = 64

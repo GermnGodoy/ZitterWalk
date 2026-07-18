@@ -13,20 +13,20 @@ from zitterwalk import viz
 
 
 def main():
+    """Run the line animation and save the GIF."""
     n = 151          # number of nodes on the line
     center = n // 2
-    t_max = 70       # number of steps to animate (< distance to the boundary)
+    t_max = 70       # steps to animate, below the distance to the boundary
 
     g = Graph.line(n)
     walk = DiscreteTimeWalk(g, coin="hadamard")
 
-    # Symmetric start: (|left> + i|right>) / sqrt(2).
+    # symmetric start (|left> + i|right>) / sqrt(2)
     w = Walker.at_node(g, center, coin_state=[1, 1j])
 
     states = walk.run(w, t_max)   # states[t] for t = 0..t_max
 
-    # kind="line": continuous curve with an adaptive y-axis so the probability
-    # stays visible even after many steps (it does not fade as it spreads).
+    # line kind uses an adaptive y-axis so the curve stays visible
     viz.animate(walk, states, save_path="line_walk.gif", kind="line", fps=10)
     print("Animation saved to line_walk.gif")
 

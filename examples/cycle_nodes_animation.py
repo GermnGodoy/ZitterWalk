@@ -13,6 +13,7 @@ from zitterwalk import viz
 
 
 def main():
+    """Run the node-colored cycle animation and save the GIF."""
     n = 24           # small cycle so the nodes are clearly visible
     start = 0
     t_max = 60
@@ -23,7 +24,7 @@ def main():
     w = Walker.at_node(g, start, coin_state=[1, 1j])
     states = walk.run(w, t_max)
 
-    # kind="graph": nodes colored by probability, on the circular layout.
+    # graph kind colors the nodes by probability on the circular layout
     viz.animate(walk, states, save_path="cycle_nodes.gif", kind="graph",
                 fps=10, node_size=650)
     print("Animation saved to cycle_nodes.gif")

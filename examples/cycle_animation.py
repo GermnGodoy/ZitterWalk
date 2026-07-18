@@ -13,6 +13,7 @@ from zitterwalk import viz
 
 
 def main():
+    """Run the cycle animation and save the GIF."""
     n = 24           # small cycle
     start = 0
     t_max = 60
@@ -20,7 +21,7 @@ def main():
     g = Graph.cycle(n)
     walk = DiscreteTimeWalk(g, coin="hadamard")
 
-    # Symmetric start: (|left> + i|right>) / sqrt(2).
+    # symmetric start (|left> + i|right>) / sqrt(2)
     w = Walker.at_node(g, start, coin_state=[1, 1j])
 
     states = walk.run(w, t_max)

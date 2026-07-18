@@ -5,14 +5,22 @@ from __future__ import annotations
 import numpy as np
 import matplotlib.pyplot as plt
 
-# ---------------------------------------------------------------------- 
+# ----------------------------------------------------------------------
 # Layout
 
 def layout(graph, kind="auto"):
-    """Return a dict {node: (x, y)} for drawing."""
+    """Node positions {node: (x, y)} for drawing.
+
+    Args:
+        graph: the graph (Graph).
+        kind: layout, one of "auto", "line", "grid", "circular".
+
+    Returns:
+        A dict {node: (x, y)}.
+    """
     nodes = graph.nodes
     if kind == "auto":
-        # Heuristic based on the shape of the ids.
+        # heuristic from the id shape
         if all(isinstance(n, tuple) and len(n) == 2 for n in nodes):
             kind = "grid"
         else:
@@ -20,7 +28,7 @@ def layout(graph, kind="auto"):
     if kind == "line":
         return {n: (i, 0.0) for i, n in enumerate(nodes)}
     if kind == "grid":
-        return {n: (n[1], -n[0]) for n in nodes}  # (col, -row): row 0 on top
+        return {n: (n[1], -n[0]) for n in nodes}  # row 0 on top
     if kind == "circular":
         m = len(nodes)
         ang = np.linspace(0, 2 * np.pi, m, endpoint=False)
@@ -28,12 +36,21 @@ def layout(graph, kind="auto"):
     raise ValueError(f"Unknown layout: {kind!r}")
 
 
-# ---------------------------------------------------------------------- 
+# ----------------------------------------------------------------------
 # Plots
 
 def plot_distribution(graph, probabilities, ax=None, **bar_kwargs):
-    """Pllot of the per-node probability."""
-    
+    """Bar plot of the per-node probability.
+
+    Args:
+        graph: the graph (Graph).
+        probabilities: per-node probability array.
+        ax: matplotlib axis to draw on.
+        **bar_kwargs: forwarded to ax.bar.
+
+    Returns:
+        The matplotlib axis.
+    """
     p = np.asarray(probabilities, dtype=float)
     if ax is None:
         _, ax = plt.subplots()
@@ -48,19 +65,30 @@ def plot_distribution(graph, probabilities, ax=None, **bar_kwargs):
 
 
 def plot_graph(graph, probabilities=None, kind="auto", ax=None, node_size=300, cmap="viridis"):
-    """Draw the graph as a node-link diagram, the color of the nodes is given by probability."""
+    """Draw the graph as a node-link diagram colored by probability.
 
+    Args:
+        graph: the graph (Graph).
+        probabilities: per-node probability array, or None.
+        kind: layout kind.
+        ax: matplotlib axis to draw on.
+        node_size: marker size.
+        cmap: colormap name.
+
+    Returns:
+        The matplotlib axis.
+    """
     pos = layout(graph, kind)
     if ax is None:
         _, ax = plt.subplots()
 
-    # Edges.
+    # edges
     for e in graph.edges:
         x0, y0 = pos[e.u]
         x1, y1 = pos[e.v]
         ax.plot([x0, x1], [y0, y1], color="0.7", zorder=1, linewidth=1)
 
-    # Nodes.
+    # nodes
     xs = [pos[n][0] for n in graph.nodes]
     ys = [pos[n][1] for n in graph.nodes]
     if probabilities is None:
@@ -69,20 +97,29 @@ def plot_graph(graph, probabilities=None, kind="auto", ax=None, node_size=300, c
         colors = np.asarray(probabilities, dtype=float)
     sc = ax.scatter(xs, ys, c=colors, s=node_size, cmap=cmap,
                     zorder=2, edgecolors="black")
-    
+
     if probabilities is not None:
         plt.colorbar(sc, ax=ax, label="probability")
-    
+
     ax.set_aspect("equal")
     ax.axis("off")
     ax.set_title("Graph")
-    
+
     return ax
 
 
 def plot_evolution(walk, states, ax=None, cmap="viridis"):
-    """Time x node heatmap of a list of states."""
+    """Time-by-node heatmap of a trajectory of states.
 
+    Args:
+        walk: the walk (DiscreteTimeWalk).
+        states: trajectory from run.
+        ax: matplotlib axis to draw on.
+        cmap: colormap name.
+
+    Returns:
+        The matplotlib axis.
+    """
     probs = np.array([walk.probabilities(s) for s in states])
     if ax is None:
         _, ax = plt.subplots()
@@ -100,29 +137,24 @@ def animate(walk, states, save_path=None, kind="line", fps=10,
     """Animate the per-node probability over time.
 
     Args:
-        walk: a DiscreteTimeWalk.
-        states: list of Walker (e.g. from ``walk.run``).
-        save_path: if given, save the animation there (GIF from a '.gif' path).
-        kind: 'line' (continuous curve, good for line/cycle), 'bar' (bar chart
-              per node) or 'graph' (node-link diagram colored by probability).
-        fps: frames per second, used for saving and default playback speed.
-        cmap: colormap for the 'graph' kind (defaults to a cohesive indigo one).
+        walk: the walk (DiscreteTimeWalk).
+        states: trajectory from run.
+        save_path: output path, saving a GIF for a '.gif' path.
+        kind: 'line', 'bar' or 'graph'.
+        fps: frames per second.
+        cmap: colormap for the 'graph' kind.
         node_size: marker size for the 'graph' kind.
         interval: delay between frames in ms (defaults to 1000/fps).
-        smooth: 'line' only. Smoothing of the adaptive y-axis, in (0, 1]. Small
-              values track the shrinking peak slowly (roughly normalized height
-              without fully rescaling every frame); 1 rescales each frame.
-        substeps: 'graph' only. Number of interpolated sub-frames inserted
-              between consecutive steps for a smoother transition (the total
-              playback duration is unchanged); 1 disables interpolation.
+        smooth: 'line' only, adaptive y-axis smoothing in (0, 1].
+        substeps: 'graph' only, interpolated sub-frames between steps (int).
+
     Returns:
         A matplotlib FuncAnimation.
     """
     import matplotlib.pyplot as plt
 
     probs = np.array([walk.probabilities(s) for s in states])
-    # Scale to the *spread* dynamics: the localized t=0 spike (prob 1 at one
-    # node) would otherwise flatten every later frame. It just saturates.
+    # ignore the localized t=0 spike so later frames stay visible
     disp = probs[1:] if len(probs) > 1 else probs
     vmax = float(disp.max()) if disp.size else 1.0
     if interval is None:
@@ -143,11 +175,12 @@ def animate(walk, states, save_path=None, kind="line", fps=10,
 
 
 def _save_anim(anim, save_path, fps):
-    """Save an animation (GIF via Pillow when the path ends in '.gif').
+    """Save an animation, using Pillow for a '.gif' path.
 
-    Uses ``anim._save_fps`` when set (e.g. by :func:`_animate_graph`, whose
-    sub-frame interpolation needs a higher save fps to keep the same
-    real-time duration) instead of the nominal ``fps``.
+    Args:
+        anim: the animation.
+        save_path: output path.
+        fps: frames per second (overridden by anim._save_fps when set).
     """
     import matplotlib.pyplot as plt
     from matplotlib.animation import PillowWriter
@@ -161,8 +194,12 @@ def _save_anim(anim, save_path, fps):
 def _smoothed_ymax(probs, smooth):
     """Per-frame y-limit that follows the peak with an exponential lag.
 
-    Returns an array ``ymax[t]``. The t=0 localized spike is ignored as a
-    starting point so the axis reflects the spread dynamics.
+    Args:
+        probs: per-frame probability array.
+        smooth: smoothing factor in (0, 1].
+
+    Returns:
+        An array of per-frame y-limits.
     """
     frame_max = probs.max(axis=1)
     ymax = np.empty_like(frame_max)
@@ -173,7 +210,7 @@ def _smoothed_ymax(probs, smooth):
     return ymax
 
 
-# Light palette built around an indigo/violet accent.
+# light palette built around an indigo/violet accent
 _PALETTE = {
     "bg": "#ffffff",       # background
     "fg": "#2b2d42",       # text / ticks
@@ -183,7 +220,11 @@ _PALETTE = {
 
 
 def _qwalk_cmap():
-    """Cohesive colormap (light lavender -> indigo -> violet) for node fills."""
+    """Cohesive lavender-to-violet colormap for node fills.
+
+    Returns:
+        A matplotlib colormap.
+    """
     from matplotlib.colors import LinearSegmentedColormap
     return LinearSegmentedColormap.from_list(
         "qwalk", ["#f5f5ff", "#b8c0ff", "#5b5bd6", "#7c3aed"]
@@ -191,7 +232,11 @@ def _qwalk_cmap():
 
 
 def _style_axes(ax):
-    """Apply the light palette (background, spines, ticks, grid) to an axis."""
+    """Apply the light palette to a matplotlib axis.
+
+    Args:
+        ax: the matplotlib axis.
+    """
     p = _PALETTE
     ax.set_facecolor(p["bg"])
     for spine in ax.spines.values():
@@ -203,12 +248,17 @@ def _style_axes(ax):
 
 
 def _line_panel(ax, walk, probs, smooth, eps=1e-9):
-    """Draw bars + smooth curve + shaded area on ``ax``; return ``update(t)``.
+    """Draw bars, a smooth curve and a shaded area on an axis.
 
-    The curve is the envelope (near-zero nodes are dropped each frame, so it is
-    not a comb on bipartite graphs like the line), over a matching bar chart
-    with a low-alpha fill. The y-limit follows the shrinking peak (see
-    :func:`_smoothed_ymax`) so the walk stays visible instead of fading.
+    Args:
+        ax: the matplotlib axis.
+        walk: the walk (DiscreteTimeWalk).
+        probs: per-frame probability array.
+        smooth: smoothing factor in (0, 1].
+        eps: threshold below which nodes are dropped from the curve.
+
+    Returns:
+        An update(t) callback that redraws frame t.
     """
     p = _PALETTE
     x = np.arange(walk.graph.n_nodes)
@@ -235,7 +285,17 @@ def _line_panel(ax, walk, probs, smooth, eps=1e-9):
 
 
 def _animate_line(walk, probs, interval, smooth):
-    """Single-panel line animation (see :func:`_line_panel`)."""
+    """Single-panel line animation.
+
+    Args:
+        walk: the walk (DiscreteTimeWalk).
+        probs: per-frame probability array.
+        interval: delay between frames in ms.
+        smooth: smoothing factor in (0, 1].
+
+    Returns:
+        A matplotlib FuncAnimation.
+    """
     import matplotlib.pyplot as plt
     from matplotlib.animation import FuncAnimation
 
@@ -262,10 +322,13 @@ def animate_compare(walks, states_list, labels=None, save_path=None,
 
     Args:
         walks: list of DiscreteTimeWalk.
-        states_list: list of state lists (one per walk), e.g. from ``walk.run``.
+        states_list: list of trajectories, one per walk.
         labels: optional per-panel titles.
-        save_path: if given, save the animation (GIF from a '.gif' path).
-        fps, smooth, interval: as in :func:`animate`.
+        save_path: output path, saving a GIF for a '.gif' path.
+        fps: frames per second.
+        smooth: adaptive y-axis smoothing in (0, 1].
+        interval: delay between frames in ms (defaults to 1000/fps).
+
     Returns:
         A matplotlib FuncAnimation.
     """
@@ -308,6 +371,17 @@ def animate_compare(walks, states_list, labels=None, save_path=None,
 
 
 def _animate_bar(walk, probs, vmax, interval):
+    """Bar-chart animation of the per-node probability.
+
+    Args:
+        walk: the walk (DiscreteTimeWalk).
+        probs: per-frame probability array.
+        vmax: fixed y-limit.
+        interval: delay between frames in ms.
+
+    Returns:
+        A matplotlib FuncAnimation.
+    """
     import matplotlib.pyplot as plt
     from matplotlib.animation import FuncAnimation
 
@@ -328,15 +402,19 @@ def _animate_bar(walk, probs, vmax, interval):
 
     anim = FuncAnimation(fig, update, frames=len(probs),
                          interval=interval, blit=False)
-    anim._fig = fig  # keep a handle so we can close it after saving
+    anim._fig = fig  # handle for closing after save
     return anim
 
 
 def _interpolate_frames(probs, substeps):
-    """Linearly interpolate ``substeps`` sub-frames between consecutive steps.
+    """Linearly interpolate sub-frames between consecutive steps.
 
-    Returns ``(interpolated_probs, t_values)``, where ``t_values`` holds the
-    (possibly fractional) original step index of each interpolated frame.
+    Args:
+        probs: per-step probability array.
+        substeps: sub-frames inserted between steps (int).
+
+    Returns:
+        The interpolated frames and their fractional step indices.
     """
     n = len(probs)
     if substeps <= 1 or n < 2:
@@ -350,6 +428,20 @@ def _interpolate_frames(probs, substeps):
 
 
 def _animate_graph(walk, probs, interval, cmap, node_size, vmax, substeps):
+    """Node-link animation with nodes colored by probability.
+
+    Args:
+        walk: the walk (DiscreteTimeWalk).
+        probs: per-step probability array.
+        interval: delay between steps in ms.
+        cmap: colormap, or None for the default.
+        node_size: marker size.
+        vmax: fixed color-scale maximum.
+        substeps: interpolated sub-frames between steps (int).
+
+    Returns:
+        A matplotlib FuncAnimation.
+    """
     import matplotlib.pyplot as plt
     from matplotlib.animation import FuncAnimation
 
@@ -374,9 +466,7 @@ def _animate_graph(walk, probs, interval, cmap, node_size, vmax, substeps):
 
     xs = [pos[n][0] for n in graph.nodes]
     ys = [pos[n][1] for n in graph.nodes]
-    # Fixed color scale: stays constant across the whole animation instead of
-    # rescaling every frame (t=0's localized spike is excluded from vmax, see
-    # the caller, so it just saturates rather than washing out later frames).
+    # fixed color scale across frames
     sc = ax.scatter(xs, ys, c=probs_i[0], s=node_size, cmap=cmap,
                     vmin=0, vmax=vmax, zorder=2,
                     edgecolors=p["fg"], linewidths=1.2)
@@ -384,8 +474,7 @@ def _animate_graph(walk, probs, interval, cmap, node_size, vmax, substeps):
     cbar.ax.yaxis.label.set_color(p["fg"])
     cbar.ax.tick_params(colors=p["fg"])
     ax.set_aspect("equal")
-    # Margin so large node markers aren't clipped by the axes edge.
-    ax.margins(0.15)
+    ax.margins(0.15)  # so large markers aren't clipped
     ax.axis("off")
     title = ax.set_title("t = 0", color=p["fg"], fontweight="bold")
 

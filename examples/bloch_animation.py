@@ -15,6 +15,7 @@ from zitterwalk import viz
 
 
 def main():
+    """Run the Bloch animation and save the GIF."""
     n = 161
     center = n // 2
     t_max = 96        # 2 Bloch periods (period ~ 48 steps)
@@ -28,7 +29,7 @@ def main():
     w = Walker.at_node(g, center, coin_state=[1, 1j])
     states = walk.run(w, t_max)
 
-    # smooth=1: rescale each frame so the breathing amplitude stays framed.
+    # smooth=1 rescales each frame so the breathing stays framed
     viz.animate(walk, states, save_path="bloch_walk.gif", kind="line",
                 fps=10, smooth=1.0)
     print("Animation saved to bloch_walk.gif")

@@ -16,14 +16,15 @@ from zitterwalk import viz
 
 
 def main():
-    n = 201                 # nodes (long line so we don't hit the boundaries)
+    """Run the Hadamard-walk example and save the figure."""
+    n = 201                 # long line so we don't hit the boundaries
     center = n // 2
     steps = 80
 
     g = Graph.line(n)
     walk = DiscreteTimeWalk(g, coin="hadamard")
 
-    # Symmetric initial state: (|left> + i|right>) / sqrt(2).
+    # symmetric initial state (|left> + i|right>) / sqrt(2)
     w = Walker.at_node(g, center, coin_state=[1, 1j])
 
     states = walk.run(w, steps)
@@ -34,8 +35,7 @@ def main():
 
     positions = np.arange(n) - center
 
-    # 1) Final distribution (only nodes with the same parity as 'steps' have
-    #    nonzero probability; we drop the rest so it looks clean).
+    # 1) final distribution, keeping only the reachable parity for a clean curve
     parity = steps % 2
     mask = (np.arange(n) % 2) == (center + parity) % 2
     ax1.plot(positions[mask], p_final[mask], color="crimson")

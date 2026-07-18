@@ -21,6 +21,7 @@ from zitterwalk import viz
 
 
 def main():
+    """Run the side-by-side Bloch comparison and save the GIF."""
     n = 161
     center = n // 2
     t_max = 96
@@ -38,7 +39,7 @@ def main():
     states = [w.run(Walker.at_node(g, center, coin_state=[1, 1j]), t_max)
               for w in walks]
 
-    # smooth=1: rescale each frame so both panels stay framed as they evolve.
+    # smooth=1 rescales each frame so both panels stay framed
     viz.animate_compare(walks, states, labels=labels,
                         save_path="bloch_compare.gif", fps=10, smooth=1.0)
     print("Animation saved to bloch_compare.gif")
